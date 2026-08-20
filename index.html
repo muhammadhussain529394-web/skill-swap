@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillSwap - Peer-to-Peer Skill Sharing Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold fs-3 me-3" href="#">SkillSwap</a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navContent">
+        <div class="d-flex mx-auto my-2 my-lg-0 w-40">
+          <input class="form-control me-2 shadow-sm" type="search" id="searchInput" placeholder="Search skills (e.g. JavaScript, Python, UI/UX)...">
+        </div>
+
+        <ul class="navbar-nav ms-auto me-3 align-items-center fw-semibold">
+          <li class="nav-item"><a class="nav-link text-white" href="#formSection">Post Request</a></li>
+          <li class="nav-item"><a class="nav-link text-white" href="#feedSection">Skill Directory</a></li>
+          <li class="nav-item"><a class="nav-link text-white" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">About Us</a></li>
+          <li class="nav-item"><a class="nav-link text-white" href="#" data-bs-toggle="modal" data-bs-target="#contactModal">Contact Us</a></li>
+          <li class="nav-item">
+            <button class="btn btn-warning btn-sm ms-2 fw-bold text-dark" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+              💬 Feedback
+            </button>
+          </li>
+        </ul>
+
+        <div class="d-flex gap-2 ms-lg-2">
+          <button class="btn btn-outline-light btn-sm px-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#profileModal" onclick="updateProfileUI()">Profile</button>
+          <button class="btn btn-light btn-sm px-3 fw-bold text-primary" id="navAuthBtn" data-bs-toggle="modal" data-bs-target="#loginModal">Login / Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <div class="bg-white py-4 shadow-sm border-bottom">
+    <div class="container text-center">
+      <h1 class="fw-bold text-dark display-6">Learn Skills & Complete Tasks Without Money</h1>
+      <p class="lead text-secondary">Trade your expertise with fellow students. Solve real learning and project hurdles together.</p>
+      
+      <div class="row g-3 justify-content-center mt-2">
+        <div class="col-6 col-md-3">
+          <div class="p-3 border rounded bg-light shadow-sm">
+            <h3 class="fw-bold text-primary mb-0" id="statTotalPosts">0</h3>
+            <small class="text-muted">Active Skill Requests</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3 border rounded bg-light shadow-sm">
+            <h3 class="fw-bold text-success mb-0">150+</h3>
+            <small class="text-muted">Community Members</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive How It Works Section -->
+  <div class="container my-4">
+    <h4 class="fw-bold text-center mb-3">How SkillSwap Works</h4>
+    <div class="row text-center g-3">
+      <div class="col-md-4">
+        <div class="p-3 bg-white rounded shadow-sm h-100 feature-card cursor-pointer" onclick="scrollToForm()">
+          <div class="fs-2 text-primary mb-1">1️⃣</div>
+          <h6 class="fw-bold mb-1">Post Your Request or Task</h6>
+          <p class="text-muted small mb-0">Select whether you offer a skill/service OR need help getting a task done.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-white rounded shadow-sm h-100 feature-card cursor-pointer" onclick="focusSearch()">
+          <div class="fs-2 text-primary mb-1">2️⃣</div>
+          <h6 class="fw-bold mb-1">Search & Filter</h6>
+          <p class="text-muted small mb-0">Search HTML, CSS, JavaScript, Python, Graphics, or UI/UX partners.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-white rounded shadow-sm h-100 feature-card cursor-pointer" onclick="scrollToFeed()">
+          <div class="fs-2 text-primary mb-1">3️⃣</div>
+          <h6 class="fw-bold mb-1">Connect & Exchange Safely</h6>
+          <p class="text-muted small mb-0">Click 'Connect' to swap skills. Report any abuse with built-in dispute safety.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Work Area -->
+  <div class="container mb-5">
+    <div class="row g-4">
+      
+      <!-- Left Column: Post Form -->
+      <div class="col-lg-5" id="formSection">
+        <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 80px;">
+          <h4 class="fw-bold text-primary mb-3">Post a Skill Exchange Request</h4>
+          
+          <form id="skillForm">
+            <!-- Feature 2: Offer vs Need Skill Selection -->
+            <div class="mb-3 p-2 border rounded bg-light">
+              <label class="form-label fw-bold d-block text-dark mb-2">Request Type:</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="requestType" id="typeOffer" value="OFFER" checked>
+                <label class="form-check-input-label fw-semibold text-success" for="typeOffer">I am Offering a Skill / Task Work</label>
+              </div>
+              <div class="form-check form-check-inline mt-1">
+                <input class="form-check-input" type="radio" name="requestType" id="typeNeed" value="NEED">
+                <label class="form-check-input-label fw-semibold text-warning" for="typeNeed">I Need Help / Task Done</label>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="userName" class="form-label fw-semibold">Your Full Name</label>
+              <input type="text" id="userName" class="form-control" placeholder="e.g. Syed Muhammad Hussain" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="needSkill" class="form-label fw-semibold">Skill Offered / Needed</label>
+              <input type="text" id="needSkill" class="form-control" placeholder="e.g. HTML/CSS, Python, UI/UX" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="offerSkill" class="form-label fw-semibold">In Exchange For (Skill/Task Expected)</label>
+              <input type="text" id="offerSkill" class="form-control" placeholder="e.g. Graphic Poster, JavaScript Help" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="contactInfo" class="form-label fw-semibold">Contact Info (Email or Phone/WhatsApp)</label>
+              <input type="text" id="contactInfo" class="form-control" placeholder="e.g. 03001234567 or email@domain.com" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-2">
+              🚀 Publish Skill Request
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Column: Filters, Requests & Exchange Feed -->
+      <div class="col-lg-7" id="feedSection">
+        <!-- Filter Tabs -->
+        <div class="mb-3 d-flex flex-wrap gap-2 align-items-center bg-white p-3 rounded shadow-sm border">
+          <span class="fw-bold text-secondary me-1">Quick Filter:</span>
+          <button class="btn btn-sm btn-outline-primary active filter-btn" onclick="filterByCategory('', this)">All</button>
+          <button class="btn btn-sm btn-outline-primary filter-btn" onclick="filterByCategory('JavaScript', this)">JavaScript</button>
+          <button class="btn btn-sm btn-outline-primary filter-btn" onclick="filterByCategory('HTML', this)">HTML / CSS</button>
+          <button class="btn btn-sm btn-outline-primary filter-btn" onclick="filterByCategory('UI/UX', this)">UI/UX Design</button>
+          <button class="btn btn-sm btn-outline-primary filter-btn" onclick="filterByCategory('Python', this)">Python</button>
+        </div>
+
+        <!-- Section Navigation -->
+        <ul class="nav nav-tabs mb-3 fw-bold" id="feedTabs">
+          <li class="nav-item">
+            <a class="nav-link active" id="all-posts-tab" href="#" onclick="switchTab('all')">Live Community Requests</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-success" id="my-requests-tab" href="#" onclick="switchTab('my-requests')">My Active Exchanges (<span id="exchangeCount">0</span>)</a>
+          </li>
+        </ul>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-dark mb-0" id="feedTitle">Available Requests</h5>
+          <span class="badge bg-primary fs-6" id="totalPostsBadge">0 Requests</span>
+        </div>
+
+        <!-- Dynamic Posts Container -->
+        <div id="postsList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Dynamic Connect Partner Modal -->
+  <div class="modal fade" id="connectModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">Initiate Skill Exchange</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <h4 id="modalPartnerName" class="fw-bold text-primary mb-2"></h4>
+          <p class="text-muted">Connect directly to trade skills and collaborate on tasks!</p>
+          <div class="p-3 bg-light rounded border mb-3">
+            <strong>Direct Contact Details:</strong> <br>
+            <span id="modalContactInfo" class="text-dark fs-5 fw-semibold"></span>
+          </div>
+          <div class="d-grid gap-2">
+            <button onclick="confirmExchange()" class="btn btn-success fw-bold">🤝 Send Skill Swap Request</button>
+            <a id="modalMailLink" href="#" class="btn btn-outline-primary fw-bold">Email Partner</a>
+            <a id="modalWhatsappLink" href="#" target="_blank" class="btn btn-outline-success fw-bold">WhatsApp Partner</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 3: Report & Dispute System Modal -->
+  <div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-danger border-2">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold">🚩 Report Abuse / Fraud</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="reportForm">
+            <input type="hidden" id="reportPostId">
+            <p class="small text-muted mb-3">This report will be sent directly to Admin Firebase backend for verification and account suspension.</p>
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold">Reason for Report</label>
+              <select id="reportReason" class="form-select" required>
+                <option value="">Select a reason...</option>
+                <option value="Incomplete Work">Did not complete work after agreement</option>
+                <option value="Fake Skill Request">Fake or misleading skill details</option>
+                <option value="Misbehavior">Abusive / Inappropriate communication</option>
+                <option value="Spam">Spamming / Unrelated post</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Detailed Explanation</label>
+              <textarea id="reportDetails" class="form-control" rows="3" placeholder="Provide details about what happened..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-danger w-100 fw-bold">Submit Report to Admin</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Us Modal -->
+  <div class="modal fade" id="aboutModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">About SkillSwap</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <h6 class="fw-bold text-primary">Peer-to-Peer Learning & Task Exchange</h6>
+          <p>SkillSwap is designed for students to exchange practical knowledge and task assistance without financial barriers. Whether you want to learn Web Development, UI/UX, or Python, you can find a student partner and swap skills mutually.</p>
+          <hr>
+          <p class="small text-muted mb-0">Developed for Web Development Course Final Project 2026.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Us Modal -->
+  <div class="modal fade" id="contactModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">Contact Us</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <h6 class="fw-bold text-dark">Management Contact Info:</h6>
+            <p class="mb-1"><strong>Founder:</strong> Syed Muhammad Hussain</p>
+            <p class="mb-1"><strong>CEO:</strong> Syed Muzammil Hussain</p>
+            <p class="mb-1"><strong>Email:</strong> muhammadhussain529394@gmail.com</p>
+            <p class="mb-0"><strong>Phone / WhatsApp:</strong> +92 300 1234567</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback & Star Rating Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">Feedback & Platform Rating</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="feedbackForm">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Your Name</label>
+              <input type="text" id="fbName" class="form-control" placeholder="Enter your name" required>
+            </div>
+            
+            <div class="mb-3 text-center">
+              <label class="form-label fw-bold d-block">Rate Your Experience</label>
+              <div class="display-6 text-warning" style="cursor: pointer;">
+                <span class="star" onclick="setRating(1)">★</span>
+                <span class="star" onclick="setRating(2)">★</span>
+                <span class="star" onclick="setRating(3)">★</span>
+                <span class="star" onclick="setRating(4)">★</span>
+                <span class="star" onclick="setRating(5)">★</span>
+              </div>
+              <small class="text-muted" id="ratingText">Select 1 to 5 Stars</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Your Feedback / Suggestions</label>
+              <textarea id="fbText" class="form-control" rows="3" placeholder="How was your skill swapping experience?" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 fw-bold">Submit Feedback</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div class="modal fade" id="profileModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">User Profile</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <div class="mb-3">
+            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fs-2" style="width:70px; height:70px;">👤</div>
+          </div>
+          <h5 class="fw-bold mb-1" id="profileEmail">Guest User</h5>
+          <span class="badge bg-success mb-3" id="profileStatus">Not Logged In</span>
+          <div class="border rounded p-3 text-start bg-light">
+            <p class="mb-1 small"><strong>Active Requests Published:</strong> <span id="userPostCount">0</span></p>
+            <p class="mb-0 small"><strong>Skill Exchanges Initiated:</strong> <span id="userExchangeCount">0</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 1: Login / Register Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">Account Login / Register</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="authForm">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Email address</label>
+              <input type="email" id="authEmail" class="form-control" placeholder="student@gmail.com" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Password</label>
+              <input type="password" id="authPass" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-warning w-100 fw-bold">Login / Register</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Testimonials Section -->
+  <div class="bg-white py-5 border-top">
+    <div class="container text-center">
+      <h4 class="fw-bold mb-4">What Students Say About SkillSwap</h4>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="p-3 border rounded shadow-sm bg-light">
+            <p class="fst-italic text-muted mb-2">"I learned React JS logic by trading my Figma UI Design skills. Extremely helpful platform!"</p>
+            <h6 class="fw-bold mb-0 text-primary">- Bilal Tanveer (CS Student)</h6>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 border rounded shadow-sm bg-light">
+            <p class="fst-italic text-muted mb-2">"Found an awesome Python partner within 10 minutes. The direct WhatsApp connection makes it super easy."</p>
+            <h6 class="fw-bold mb-0 text-primary">- Ayesha Khan (Web Dev Learner)</h6>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 border rounded shadow-sm bg-light">
+            <p class="fst-italic text-muted mb-2">"Best peer-to-peer learning tool! Zero money spent and learned Bootstrap 5 completely."</p>
+            <h6 class="fw-bold mb-0 text-primary">- Daniyal Ahmed (Frontend Enthusiast)</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Footer -->
+  <footer class="bg-dark text-white pt-4 pb-3 mt-auto border-top border-warning border-3">
+    <div class="container">
+      <div class="row g-3 text-center text-md-start">
+        <div class="col-md-6">
+          <h5 class="fw-bold text-warning">SkillSwap Platform</h5>
+          <p class="small text-secondary mb-0">Empowering peer-to-peer learning and skill trading without monetary bar. Firebase Backend Integrated.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <h6 class="fw-bold text-white mb-2">Leadership & Management</h6>
+          <p class="small mb-1"><strong class="text-warning">Founder:</strong> Syed Muhammad Hussain</p>
+          <p class="small mb-0"><strong class="text-warning">CEO:</strong> Syed Muzammil Hussain</p>
+        </div>
+      </div>
+      <hr class="bg-secondary my-3">
+      <div class="text-center">
+        <small class="text-secondary">&copy; 2026 SkillSwap - Web Development Final Project. All Rights Reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
