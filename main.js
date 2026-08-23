@@ -225,42 +225,43 @@ function openReportModal(postId) {
   const modal = new bootstrap.Modal(document.getElementById('reportModal'));
   modal.show();
 }
-
-// Report Form Submission (Saved Direct to Firebase Firestore)
-const reportForm = document.getElementById('reportForm');
-if(reportForm) {
-  reportForm.addEventListener('submit', async function(e) {
+// Robust Report Submission
+document.addEventListener('submit', async function (e) {
+  if (e.target && e.target.id === 'reportForm') {
     e.preventDefault();
-    const postId = document.getElementById('reportPostId').value;
+
+    const postId = document.getElementById('reportPostId').value || 'general';
     const reason = document.getElementById('reportReason').value;
     const details = document.getElementById('reportDetails').value;
 
     try {
-      if(window.db) {
+      if (window.db) {
         await window.db.collection("reports").add({
           postId: postId,
           reason: reason,
           details: details,
           createdAt: new Date().toISOString()
         });
+        showToast("🚩 Report submitted successfully to Firebase!");
+      } else {
+        reports.push({ postId, reason, details, date: new Date().toISOString() });
+        localStorage.setItem('skill_swap_reports', JSON.stringify(reports));
+        showToast("🚩 Report saved successfully!");
       }
-
-      reports.push({ postId, reason, details, date: new Date().toISOString() });
-      localStorage.setItem('skill_swap_reports', JSON.stringify(reports));
 
       const modalEl = document.getElementById('reportModal');
       const modalObj = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-      modalObj.hide();
+      if (modalObj) modalObj.hide();
 
-      showToast("🚩 Report submitted successfully to Firebase!");
-      this.reset();
+      e.target.reset();
     } catch (err) {
-      console.error(err);
-      showToast("⚠️ Firebase Error: Report saved locally.");
+      console.error("Report Error:", err);
+      showToast("⚠️ Submission Error: " + err.message);
     }
-  });
-}
+  }
+});
 
+      
 // Publish Skill Form Submission
 const skillForm = document.getElementById('skillForm');
 if(skillForm) {
