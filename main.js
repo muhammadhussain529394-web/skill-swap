@@ -41,7 +41,7 @@ let currentUser = localStorage.getItem('skill_swap_user') || null;
 let activeTab = 'all'; 
 let currentSelectedPartner = null;
 
-if(!localStorage.getItem('skill_swap_posts')) {
+if (!localStorage.getItem('skill_swap_posts')) {
   localStorage.setItem('skill_swap_posts', JSON.stringify(posts));
 }
 
@@ -69,10 +69,10 @@ function displayPosts(filterText = '') {
   const statTotalPosts = document.getElementById('statTotalPosts');
   const exchangeCount = document.getElementById('exchangeCount');
   
-  if(!postsList) return;
+  if (!postsList) return;
   postsList.innerHTML = '';
-  if(exchangeCount) exchangeCount.textContent = exchanges.length;
-  if(statTotalPosts) statTotalPosts.textContent = posts.length;
+  if (exchangeCount) exchangeCount.textContent = exchanges.length;
+  if (statTotalPosts) statTotalPosts.textContent = posts.length;
 
   let currentList = (activeTab === 'all') ? posts : exchanges;
 
@@ -82,7 +82,7 @@ function displayPosts(filterText = '') {
     post.name.toLowerCase().includes(filterText.toLowerCase())
   );
 
-  if(totalPostsBadge) totalPostsBadge.textContent = `${filteredPosts.length} Items`;
+  if (totalPostsBadge) totalPostsBadge.textContent = `${filteredPosts.length} Items`;
 
   if (filteredPosts.length === 0) {
     postsList.innerHTML = `
@@ -144,24 +144,24 @@ function switchTab(tab) {
 // Category Filters
 function filterByCategory(category, btnElement) {
   document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-  if(btnElement) btnElement.classList.add('active');
+  if (btnElement) btnElement.classList.add('active');
   
   const search = document.getElementById('searchInput');
-  if(search) search.value = category;
+  if (search) search.value = category;
   displayPosts(category);
 }
 
 // Scroll Handlers
 function scrollToForm() {
   const el = document.getElementById('formSection');
-  if(el) el.scrollIntoView({ behavior: 'smooth' });
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
   const input = document.getElementById('userName');
-  if(input) input.focus();
+  if (input) input.focus();
 }
 
 function focusSearch() {
   const search = document.getElementById('searchInput');
-  if(search) {
+  if (search) {
     search.scrollIntoView({ behavior: 'smooth' });
     search.focus();
   }
@@ -169,7 +169,7 @@ function focusSearch() {
 
 function scrollToFeed() {
   const el = document.getElementById('feedSection');
-  if(el) el.scrollIntoView({ behavior: 'smooth' });
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
 }
 
 // Connect Modal Handler
@@ -181,7 +181,7 @@ function openConnectModal(name, contact) {
   const mailBtn = document.getElementById('modalMailLink');
   const waBtn = document.getElementById('modalWhatsappLink');
 
-  if(contact.includes('@')) {
+  if (contact.includes('@')) {
     mailBtn.href = `mailto:${contact}`;
     mailBtn.style.display = 'inline-block';
   } else {
@@ -189,7 +189,7 @@ function openConnectModal(name, contact) {
   }
 
   const cleanNum = contact.replace(/[^0-9]/g, '');
-  if(cleanNum.length >= 10) {
+  if (cleanNum.length >= 10) {
     waBtn.href = `https://wa.me/${cleanNum}`;
     waBtn.style.display = 'inline-block';
   } else {
@@ -202,10 +202,10 @@ function openConnectModal(name, contact) {
 
 // Confirm Exchange Request
 function confirmExchange() {
-  if(!currentSelectedPartner) return;
+  if (!currentSelectedPartner) return;
   
   const matched = posts.find(p => p.name === currentSelectedPartner.name);
-  if(matched && !exchanges.some(e => e.name === matched.name)) {
+  if (matched && !exchanges.some(e => e.name === matched.name)) {
     exchanges.push(matched);
     localStorage.setItem('skill_swap_exchanges', JSON.stringify(exchanges));
     showToast(`🤝 Exchange Initiated with ${currentSelectedPartner.name}!`);
@@ -221,50 +221,15 @@ function confirmExchange() {
 
 // Report Modal Trigger
 function openReportModal(postId) {
-  document.getElementById('reportPostId').value = postId;
+  const input = document.getElementById('reportPostId');
+  if (input) input.value = postId;
   const modal = new bootstrap.Modal(document.getElementById('reportModal'));
   modal.show();
 }
-// Robust Report Submission
-document.addEventListener('submit', async function (e) {
-  if (e.target && e.target.id === 'reportForm') {
-    e.preventDefault();
 
-    const postId = document.getElementById('reportPostId').value || 'general';
-    const reason = document.getElementById('reportReason').value;
-    const details = document.getElementById('reportDetails').value;
-
-    try {
-      if (window.db) {
-        await window.db.collection("reports").add({
-          postId: postId,
-          reason: reason,
-          details: details,
-          createdAt: new Date().toISOString()
-        });
-        showToast("🚩 Report submitted successfully to Firebase!");
-      } else {
-        reports.push({ postId, reason, details, date: new Date().toISOString() });
-        localStorage.setItem('skill_swap_reports', JSON.stringify(reports));
-        showToast("🚩 Report saved successfully!");
-      }
-
-      const modalEl = document.getElementById('reportModal');
-      const modalObj = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-      if (modalObj) modalObj.hide();
-
-      e.target.reset();
-    } catch (err) {
-      console.error("Report Error:", err);
-      showToast("⚠️ Submission Error: " + err.message);
-    }
-  }
-});
-
-      
 // Publish Skill Form Submission
 const skillForm = document.getElementById('skillForm');
-if(skillForm) {
+if (skillForm) {
   skillForm.addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -297,7 +262,7 @@ function deletePost(index) {
 
 // Auth Login Handler
 const authForm = document.getElementById('authForm');
-if(authForm) {
+if (authForm) {
   authForm.addEventListener('submit', function(e) {
     e.preventDefault();
     const email = document.getElementById('authEmail').value;
@@ -319,33 +284,33 @@ function updateProfileUI() {
   const userPostCount = document.getElementById('userPostCount');
   const userExchangeCount = document.getElementById('userExchangeCount');
 
-  if(currentUser) {
-    if(profileEmail) profileEmail.textContent = currentUser;
-    if(profileStatus) {
+  if (currentUser) {
+    if (profileEmail) profileEmail.textContent = currentUser;
+    if (profileStatus) {
       profileStatus.textContent = "Active Logged In Member";
       profileStatus.className = "badge bg-success mb-3";
     }
   } else {
-    if(profileEmail) profileEmail.textContent = "Guest User";
-    if(profileStatus) {
+    if (profileEmail) profileEmail.textContent = "Guest User";
+    if (profileStatus) {
       profileStatus.textContent = "Not Logged In";
       profileStatus.className = "badge bg-secondary mb-3";
     }
   }
 
-  if(userPostCount) userPostCount.textContent = posts.length;
-  if(userExchangeCount) userExchangeCount.textContent = exchanges.length;
+  if (userPostCount) userPostCount.textContent = posts.length;
+  if (userExchangeCount) userExchangeCount.textContent = exchanges.length;
 }
 
 function updateAuthUI() {
   const btn = document.getElementById('navAuthBtn');
-  if(btn && currentUser) {
+  if (btn && currentUser) {
     btn.textContent = "Logged In";
     btn.className = "btn btn-success btn-sm px-3 fw-bold";
   }
 }
 
-// Export Functions to Window Scope
+// Global Window Exports
 window.deletePost = deletePost;
 window.openConnectModal = openConnectModal;
 window.openReportModal = openReportModal;
@@ -357,14 +322,54 @@ window.focusSearch = focusSearch;
 window.scrollToFeed = scrollToFeed;
 window.updateProfileUI = updateProfileUI;
 
-// On Page Load Init
+// DOM Ready Init
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
-  if(searchInput) {
+  if (searchInput) {
     searchInput.addEventListener('input', function(e) {
       displayPosts(e.target.value);
     });
   }
   updateAuthUI();
   displayPosts();
+});
+// Global Direct Fix for Report Submission
+document.addEventListener("click", async function (e) {
+  if (e.target && e.target.textContent.trim().includes("Submit Report")) {
+    e.preventDefault();
+
+    const postId = document.getElementById("reportPostId")?.value || "general_post";
+    const reason = document.getElementById("reportReason")?.value || "Unresponsive User";
+    const details = document.getElementById("reportDetails")?.value || "";
+
+    if (!details.trim()) {
+      alert("Please fill in additional details before submitting!");
+      return;
+    }
+
+    try {
+      if (window.db) {
+        await window.db.collection("reports").add({
+          postId: postId,
+          reason: reason,
+          details: details,
+          createdAt: new Date().toISOString()
+        });
+        alert("🚩 SUCCESS: Report Firebase par submit ho chuki hai!");
+      } else {
+        alert("⚠️ Firestore initialization error (window.db not found)!");
+      }
+
+      // Close modal
+      const modalEl = document.getElementById("reportModal");
+      if (modalEl) {
+        const modalObj = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        if (modalObj) modalObj.hide();
+      }
+
+      document.getElementById("reportDetails").value = "";
+    } catch (err) {
+      alert("Database Error: " + err.message);
+    }
+  }
 });
