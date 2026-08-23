@@ -1,3 +1,6 @@
+import { db } from "./firebase-config.js"; // Aapki firebase config file ka path
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 // Initial Multi-Skill Requests Data
 let defaultPosts = [
   {
@@ -41,12 +44,11 @@ let currentUser = localStorage.getItem('skill_swap_user') || null;
 let activeTab = 'all'; 
 let currentSelectedPartner = null;
 
-// Save initial dataset if empty
 if(!localStorage.getItem('skill_swap_posts')) {
   localStorage.setItem('skill_swap_posts', JSON.stringify(posts));
 }
 
-// Toast Notification Popup Handler
+// Toast Notification
 function showToast(message) {
   const toastContainer = document.createElement('div');
   toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
@@ -63,7 +65,7 @@ function showToast(message) {
   setTimeout(() => toastContainer.remove(), 3500);
 }
 
-// Display Posts Logic
+// Display Posts Logic with Dynamic Search/Filter
 function displayPosts(filterText = '') {
   const postsList = document.getElementById('postsList');
   const totalPostsBadge = document.getElementById('totalPostsBadge');
@@ -142,7 +144,7 @@ function switchTab(tab) {
   displayPosts();
 }
 
-// Quick Filter Buttons Handler
+// Fixed Quick Filter Buttons Handler
 function filterByCategory(category, btnElement) {
   document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
   if(btnElement) btnElement.classList.add('active');
@@ -152,15 +154,18 @@ function filterByCategory(category, btnElement) {
   displayPosts(category);
 }
 
-// Live Search Listener
-const searchInput = document.getElementById('searchInput');
-if(searchInput) {
-  searchInput.addEventListener('input', function(e) {
-    displayPosts(e.target.value);
-  });
-}
+// Live Search Input Listener
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('searchInput');
+  if(searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      displayPosts(e.target.value);
+    });
+  }
+  displayPosts();
+});
 
-// Smooth Scroll Helpers
+// Smooth Scroll
 function scrollToForm() {
   document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
   document.getElementById('userName').focus();
@@ -228,21 +233,31 @@ function openReportModal(postId) {
   modal.show();
 }
 
-// Report Form Submission
+// FIX: Direct Report Submission to Firebase Firestore
 const reportForm = document.getElementById('reportForm');
 if(reportForm) {
-  reportForm.addEventListener('submit', function(e) {
+  reportForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     const postId = document.getElementById('reportPostId').value;
     const reason = document.getElementById('reportReason').value;
     const details = document.getElementById('reportDetails').value;
 
-    reports.push({ postId, reason, details, date: new Date().toISOString() });
-    localStorage.setItem('skill_swap_reports', JSON.stringify(reports));
+    try {
+      // Direct push to Firebase "reports" Collection
+      await addDoc(collection(db, "reports"), {
+        postId: postId,
+        reason: reason,
+        details: details,
+        createdAt: new Date().toISOString()
+      });
 
-    bootstrap.Modal.getInstance(document.getElementById('reportModal')).hide();
-    showToast("🚩 Report submitted successfully to Admin backend.");
-    this.reset();
+      bootstrap.Modal.getInstance(document.getElementById('reportModal')).hide();
+      showToast("🚩 Report submitted successfully to Firebase Database!");
+      this.reset();
+    } catch (error) {
+      console.error("Firebase Report Error: ", error);
+      showToast("⚠️ Report Error: " + error.message);
+    }
   });
 }
 
@@ -350,7 +365,7 @@ if(feedbackForm) {
   });
 }
 
-// Attach Functions to Global Window Scope for Inline HTML Events
+// Attach Functions to Global Window Scope
 window.deletePost = deletePost;
 window.openConnectModal = openConnectModal;
 window.openReportModal = openReportModal;
@@ -363,6 +378,4 @@ window.scrollToFeed = scrollToFeed;
 window.updateProfileUI = updateProfileUI;
 window.setRating = setRating;
 
-// Initial Setup Calls
 updateAuthUI();
-displayPosts();
