@@ -12,7 +12,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <!-- YAHAN PASTE KAREIN (Apni Real Firebase Keys Ke Saath) -->
+  <!-- Firebase Initialization -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSy...", 
@@ -40,6 +40,18 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-semibold">
+          <li class="nav-item">
+            <a class="nav-link text-white" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="#" data-bs-toggle="modal" data-bs-target="#contactModal">Contact Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="#" data-bs-toggle="modal" data-bs-target="#feedbackModal">Feedback</a>
+          </li>
+        </ul>
+
         <div class="d-flex mx-auto my-2 my-lg-0 w-50">
           <input class="form-control me-2 shadow-sm" type="search" id="searchInput" placeholder="Search HTML, CSS, JS, Python...">
         </div>
@@ -179,6 +191,61 @@
   </div>
 
   <!-- Modals Section -->
+  
+  <!-- About Us Modal -->
+  <div class="modal fade" id="aboutModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">About SkillSwap</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>SkillSwap is a peer-to-peer student platform designed to exchange practical knowledge without financial transactions. Help fellow developers and build real project experience together!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Us Modal -->
+  <div class="modal fade" id="contactModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">Contact Us</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p>For support, general feedback, or reporting issues:</p>
+          <p class="fw-bold text-primary fs-5 mb-0">support@skillswap.com</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title fw-bold">💬 Feedback Form</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Your Email</label>
+            <input type="email" class="form-control" id="feedbackEmail" placeholder="student@example.com">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Your Feedback / Suggestions</label>
+            <textarea class="form-control" id="feedbackText" rows="3" placeholder="Tell us how we can improve..."></textarea>
+          </div>
+          <button type="button" id="submitFeedbackBtn" class="btn btn-success w-100 fw-bold">Submit Feedback</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Profile Modal -->
   <div class="modal fade" id="profileModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -258,7 +325,8 @@
       </div>
     </div>
   </div>
-<!-- Report Modal -->
+
+  <!-- Report Modal -->
   <div class="modal fade" id="reportModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -270,7 +338,7 @@
           <input type="hidden" id="reportPostId">
           <div class="mb-3">
             <label class="form-label fw-bold">Reason for Report</label>
-            <select class="form-select" id="reportReason" required>
+            <select class="form-select" id="reportReason">
               <option value="Inappropriate Content">Inappropriate Content</option>
               <option value="Spam / Fake Post">Spam / Fake Post</option>
               <option value="Unresponsive User">Unresponsive User</option>
@@ -279,19 +347,99 @@
           </div>
           <div class="mb-3">
             <label class="form-label fw-bold">Additional Details</label>
-            <textarea class="form-control" id="reportDetails" rows="3" placeholder="Provide details..." required></textarea>
+            <textarea class="form-control" id="reportDetails" rows="3" placeholder="Provide details..."></textarea>
           </div>
-          <button type="button" onclick="submitReportToFirebase()" class="btn btn-warning w-100 fw-bold">Submit Report to Firebase</button>
+          <button type="button" id="standaloneReportSubmitBtn" class="btn btn-warning w-100 fw-bold">Submit Report to Firebase</button>
         </div>
       </div>
     </div>
   </div>
 
-        
-
   <!-- JS Dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Standard JS Script Tag -->
+  
+  <!-- Standalone Direct Handlers for Report and Feedback Modals -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      
+      // Direct Report Submit Handler
+      const reportBtn = document.getElementById("standaloneReportSubmitBtn");
+      if (reportBtn) {
+        reportBtn.onclick = async function() {
+          const details = document.getElementById("reportDetails")?.value;
+          const reason = document.getElementById("reportReason")?.value;
+          const postId = document.getElementById("reportPostId")?.value || "general_post";
+
+          if (!details || !details.trim()) {
+            alert("Kharabi: Report details likhna zaroori hai!");
+            return;
+          }
+
+          try {
+            if (window.db) {
+              await window.db.collection("reports").add({
+                postId: postId,
+                reason: reason,
+                details: details,
+                createdAt: new Date().toISOString()
+              });
+              alert("🚩 SUCCESS: Report Firebase par successfully submit ho chuki hai!");
+            } else {
+              alert("⚠️ Error: Firebase initialize nahi hai!");
+            }
+
+            // Modal Close
+            const modalEl = document.getElementById("reportModal");
+            const modalObj = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            if (modalObj) modalObj.hide();
+
+            document.getElementById("reportDetails").value = "";
+          } catch (err) {
+            alert("Firestore Error: " + err.message);
+          }
+        };
+      }
+
+      // Direct Feedback Submit Handler
+      const feedbackBtn = document.getElementById("submitFeedbackBtn");
+      if (feedbackBtn) {
+        feedbackBtn.onclick = async function() {
+          const email = document.getElementById("feedbackEmail")?.value;
+          const feedback = document.getElementById("feedbackText")?.value;
+
+          if (!feedback || !feedback.trim()) {
+            alert("Kharabi: Feedback text likhna zaroori hai!");
+            return;
+          }
+
+          try {
+            if (window.db) {
+              await window.db.collection("feedbacks").add({
+                email: email || "Anonymous",
+                feedback: feedback,
+                createdAt: new Date().toISOString()
+              });
+              alert("💬 SUCCESS: Aapka Feedback Firebase par save ho gaya hai!");
+            } else {
+              alert("⚠️ Error: Firebase initialize nahi hai!");
+            }
+
+            // Modal Close
+            const modalEl = document.getElementById("feedbackModal");
+            const modalObj = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            if (modalObj) modalObj.hide();
+
+            document.getElementById("feedbackText").value = "";
+          } catch (err) {
+            alert("Firestore Error: " + err.message);
+          }
+        };
+      }
+
+    });
+  </script>
+
+  <!-- External JS Script -->
   <script src="main.js"></script>
 </body>
 </html>
