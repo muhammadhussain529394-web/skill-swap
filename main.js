@@ -77,9 +77,9 @@ function displayPosts(filterText = '') {
   let currentList = (activeTab === 'all') ? posts : exchanges;
 
   const filteredPosts = currentList.filter(post => 
-    post.need.toLowerCase().includes(filterText.toLowerCase()) ||
-    post.offer.toLowerCase().includes(filterText.toLowerCase()) ||
-    post.name.toLowerCase().includes(filterText.toLowerCase())
+    (post.need && post.need.toLowerCase().includes(filterText.toLowerCase())) ||
+    (post.offer && post.offer.toLowerCase().includes(filterText.toLowerCase())) ||
+    (post.name && post.name.toLowerCase().includes(filterText.toLowerCase()))
   );
 
   if (totalPostsBadge) totalPostsBadge.textContent = `${filteredPosts.length} Items`;
@@ -102,7 +102,7 @@ function displayPosts(filterText = '') {
       : `<span class="badge bg-success">✅ Request Type: OFFERING SKILL</span>`;
 
     const cardHTML = `
-      <div class="card p-3 mb-3 shadow-sm border-0 post-card">
+      <div class="card p-3 mb-3 shadow-sm border-0 post-card ${post.type}">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <div>
             <h5 class="fw-bold mb-1 text-dark">${post.name}</h5>
@@ -215,7 +215,7 @@ function confirmExchange() {
 
   const modalEl = document.getElementById('connectModal');
   const modalObj = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-  modalObj.hide();
+  if (modalObj) modalObj.hide();
   displayPosts();
 }
 
@@ -272,7 +272,7 @@ if (authForm) {
     updateAuthUI();
     const modalEl = document.getElementById('loginModal');
     const modalObj = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-    modalObj.hide();
+    if (modalObj) modalObj.hide();
     showToast(`✅ Logged in successfully as ${currentUser}!`);
   });
 }
@@ -332,44 +332,4 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   updateAuthUI();
   displayPosts();
-});
-// Global Direct Fix for Report Submission
-document.addEventListener("click", async function (e) {
-  if (e.target && e.target.textContent.trim().includes("Submit Report")) {
-    e.preventDefault();
-
-    const postId = document.getElementById("reportPostId")?.value || "general_post";
-    const reason = document.getElementById("reportReason")?.value || "Unresponsive User";
-    const details = document.getElementById("reportDetails")?.value || "";
-
-    if (!details.trim()) {
-      alert("Please fill in additional details before submitting!");
-      return;
-    }
-
-    try {
-      if (window.db) {
-        await window.db.collection("reports").add({
-          postId: postId,
-          reason: reason,
-          details: details,
-          createdAt: new Date().toISOString()
-        });
-        alert("🚩 SUCCESS: Report Firebase par submit ho chuki hai!");
-      } else {
-        alert("⚠️ Firestore initialization error (window.db not found)!");
-      }
-
-      // Close modal
-      const modalEl = document.getElementById("reportModal");
-      if (modalEl) {
-        const modalObj = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        if (modalObj) modalObj.hide();
-      }
-
-      document.getElementById("reportDetails").value = "";
-    } catch (err) {
-      alert("Database Error: " + err.message);
-    }
-  }
 });
